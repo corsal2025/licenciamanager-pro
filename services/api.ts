@@ -13,7 +13,7 @@ export const api = {
       headers,
     });
     if (!response.ok) {
-        throw new Error(`API Error: ${response.statusText}`);
+      throw new Error(`API Error: ${response.statusText}`);
     }
     return response.json();
   },
@@ -31,8 +31,8 @@ export const api = {
       body: JSON.stringify(data),
     });
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || `API Error: ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || `API Error: ${response.statusText}`);
     }
     return response.json();
   },
@@ -50,7 +50,7 @@ export const api = {
       body: JSON.stringify(data),
     });
     if (!response.ok) {
-        throw new Error(`API Error: ${response.statusText}`);
+      throw new Error(`API Error: ${response.statusText}`);
     }
     return response.json();
   },
@@ -67,7 +67,28 @@ export const api = {
       headers,
     });
     if (!response.ok) {
-        throw new Error(`API Error: ${response.statusText}`);
+      throw new Error(`API Error: ${response.statusText}`);
+    }
+    return response.json();
+  },
+
+  upload: async (endpoint: string, formData: FormData, token?: string) => {
+    const headers: HeadersInit = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    // Note: Do NOT set Content-Type to multipart/form-data manually. 
+    // Fetch does it automatically with the correct boundary.
+
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || `API Error: ${response.statusText}`);
     }
     return response.json();
   },

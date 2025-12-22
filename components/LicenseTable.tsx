@@ -4,6 +4,7 @@ import { LicenseData, LicenseStatus, ProcessStatus, UserRole } from '../types';
 import { Search, FileCheck, MapPin, AlertOctagon, User, FileSpreadsheet, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Trash2, ArrowUpDown, CheckSquare, CreditCard, XCircle, CalendarDays, Map, FolderX, Ban, UploadCloud, Home, Clock, Sparkles, Building2, Archive, Siren, MessageCircle } from 'lucide-react';
 import { exportToCSV } from '../utils/formatters';
 import { authService } from '../services/authService';
+import AuditTimeline from './AuditTimeline';
 
 interface LicenseTableProps {
   licenses: LicenseData[];
@@ -45,6 +46,9 @@ const LicenseTable: React.FC<LicenseTableProps> = ({
 
   // Selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // Audit State
+  const [auditInfo, setAuditInfo] = useState<{ id: string, name: string } | null>(null);
 
   // Filter Logic
   const filteredLicenses = useMemo(() => {
@@ -432,6 +436,13 @@ const LicenseTable: React.FC<LicenseTableProps> = ({
                             <Trash2 className="w-4 h-4" />
                           </button>
                         )}
+                        <button
+                          onClick={() => setAuditInfo({ id: license.id, name: license.fullName })}
+                          className="text-slate-400 hover:text-indigo-600 p-1 rounded-md hover:bg-indigo-50 transition-colors"
+                          title="Ver Historial"
+                        >
+                          <Activity className="w-4 h-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -488,6 +499,15 @@ const LicenseTable: React.FC<LicenseTableProps> = ({
         </div>
 
       </div>
+
+      {auditInfo && (
+        <AuditTimeline
+          entityId={auditInfo.id}
+          entityTitle={auditInfo.name}
+          isOpen={true}
+          onClose={() => setAuditInfo(null)}
+        />
+      )}
     </div>
   );
 };

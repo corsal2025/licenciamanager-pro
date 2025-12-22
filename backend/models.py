@@ -93,3 +93,19 @@ class AuditLog(Base):
     action = Column(String)
     details = Column(String)
     ip = Column(String, nullable=True)
+    
+    # Enhanced Tracking
+    entity_id = Column(String, nullable=True, index=True) # ID of License/User affected
+    changes = Column(String, nullable=True) # JSON string of changes
+
+
+class Appointment(Base):
+    __tablename__ = "appointments"
+
+    id = Column(String, primary_key=True, index=True)
+    rut = Column(String, index=True) # Linked to citizen RUT
+    date = Column(String) # YYYY-MM-DD
+    time = Column(String) # HH:MM
+    status = Column(String, default="CONFIRMED") # CONFIRMED, CANCELLED, COMPLETED
+    created_at = Column(Integer, default=lambda: int(time.time()))
+

@@ -13,11 +13,7 @@ app = FastAPI(
 )
 
 # CORS Configuration - Allow Frontend access
-origins = [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "http://127.0.0.1:3000",
-]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,10 +25,14 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(licenses.router)
-from .routers import drive, logs, purchases
+
+from .routers import drive, logs, purchases, ai, appointments
 app.include_router(drive.router)
 app.include_router(logs.router)
 app.include_router(purchases.router)
+app.include_router(ai.router)
+app.include_router(appointments.router)
+
 from .routers import public
 app.include_router(public.router)
 

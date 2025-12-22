@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, ArrowLeft, CheckCircle, AlertTriangle, Clock, MapPin, XCircle } from 'lucide-react';
+import { Search, ArrowLeft, CheckCircle, AlertTriangle, Clock, MapPin, XCircle, Calendar } from 'lucide-react';
 import { api } from '../services/api';
 
 interface PublicStatus {
@@ -18,6 +18,46 @@ const PublicPortal: React.FC<PublicPortalProps> = ({ onBack }) => {
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<PublicStatus | null>(null);
     const [error, setError] = useState('');
+
+    // Booking State
+    const [showBooking, setShowBooking] = useState(false);
+    const [selectedDate, setSelectedDate] = useState('');
+    const [selectedTime, setSelectedTime] = useState('');
+    const [slots, setSlots] = useState<string[]>([]);
+    const [loadingSlots, setLoadingSlots] = useState(false);
+    const [bookingSuccess, setBookingSuccess] = useState(false);
+    const [bookingLoading, setBookingLoading] = useState(false);
+
+    const fetchSlots = async (date: string) => {
+        setLoadingSlots(true);
+        setSlots([]);
+        try {
+            const data = await api.get(`/appointments/slots?date=${date}`);
+            setSlots(data.slots);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoadingSlots(false);
+        }
+    };
+
+    const handleBook = async () => {
+        if (!result) return;
+        setBookingLoading(true);
+        try {
+            await api.post('/appointments/book', {
+                rut: result.rut, // Use cleaned rut from result
+                date: selectedDate,
+                time: selectedTime
+            });
+            setBookingSuccess(true);
+        } catch (e: any) {
+            setError(e.message || 'Error al reservar');
+            setShowBooking(false); // Close to show error
+        } finally {
+            setBookingLoading(false);
+        }
+    };
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -122,18 +162,104 @@ const PublicPortal: React.FC<PublicPortalProps> = ({ onBack }) => {
                                     Última Act.: {new Date(parseInt(result.lastUpdate) * 1000).toLocaleDateString()}
                                 </div>
 
-                                {result.processStatus === 'LISTA PARA ENTREGA' && (
-                                    <div className="flex items-center gap-2 text-xs font-bold bg-white/60 px-3 py-1 rounded-full">
-                                        <MapPin className="w-3 h-3" />
-                                        Disponible para retiro en Oficina
-                                    </div>
+                                <div className="flex items-center gap-2 text-xs font-bold bg-white/60 px-3 py-1 rounded-full">
+                                    <MapPin className="w-3 h-3" />
+                                    Disponible para retiro en Oficina
+                                </div>
+                                <button
+                                    onClick={() => setShowBooking(true)}
+                                    className="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors shadow-sm flex items-center gap-2"
+                                >
+                                    <Calendar className="w-3 h-3" />
+                                    Agendar Retiro
+                                </button>
+                            </>
                                 )}
-                                {result.processStatus === 'PENDIENTE' && (
-                                    <div className="text-xs italic bg-white/60 px-3 py-1 rounded-full">
-                                        Tu trámite sigue en proceso normal.
-                                    </div>
-                                )}
+                            {result.processStatus === 'PENDIENTE' && (
+                                <div className="text-xs italic bg-white/60 px-3 py-1 rounded-full">
+                                    Tu trámite sigue en proceso normal.
+                                </div>
+                            )}
+                        </div>
+
+                            {/* Booking Section */}
+                    {showBooking && (
+                        <div className="mt-4 p-4 bg-white border border-slate-200 rounded-xl animate-in slide-in-from-bottom-2">
+                            <div className="flex justify-between items-center mb-4">
+                                <div>
+                                    <h4 className="font-bold text-slate-800 flex items-center gap-2">
+                                        <Calendar className="w-4 h-4 text-indigo-600" />
+                                        Reserva tu Hora de Retiro
+                                    </h4>
+                                    <p className="text-xs text-slate-500 mt-1">Exclusivo para retirar documentos finalizados.</p>
+                                </div>
+                                <button onClick={() => setShowBooking(false)} className="text-slate-400 hover:text-slate-600">
+                                    <XCircle className="w-5 h-5" />
+                                </button>
                             </div>
+
+                            {!bookingSuccess ? (
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-600 mb-1">Elige una Fecha</label>
+                                        <input
+                                            type="date"
+                                            value={selectedDate}
+                                            min={new Date().toISOString().split('T')[0]}
+                                            onChange={(e) => {
+                                                setSelectedDate(e.target.value);
+                                                fetchSlots(e.target.value);
+                                            }}
+                                            className="w-full text-sm p-2 border border-slate-300 rounded-lg"
+                                        />
+                                    </div>
+
+                                    {selectedDate && (
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-600 mb-2">Horarios Disponibles</label>
+                                            {loadingSlots ? (
+                                                <div className="text-center py-2"><span className="animate-spin inline-block w-4 h-4 border-2 border-indigo-500 rounded-full border-t-transparent"></span></div>
+                                            ) : (
+                                                <div className="grid grid-cols-3 gap-2">
+                                                    {slots.length > 0 ? slots.map(slot => (
+                                                        <button
+                                                            key={slot}
+                                                            onClick={() => setSelectedTime(slot)}
+                                                            className={`text-xs py-2 rounded-lg border transition-all ${selectedTime === slot
+                                                                ? 'bg-indigo-600 text-white border-indigo-600'
+                                                                : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-indigo-300'
+                                                                }`}
+                                                        >
+                                                            {slot}
+                                                        </button>
+                                                    )) : (
+                                                        <p className="col-span-3 text-xs text-red-500 text-center">No hay horas para este día.</p>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    <button
+                                        onClick={handleBook}
+                                        disabled={!selectedDate || !selectedTime || bookingLoading}
+                                        className="w-full bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold py-2 rounded-lg transition-colors mt-2"
+                                    >
+                                        {bookingLoading ? 'Confirmando...' : 'Confirmar Reserva'}
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="text-center py-4 space-y-2">
+                                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <CheckCircle className="w-6 h-6 text-green-600" />
+                                    </div>
+                                    <h5 className="font-bold text-green-800">¡Reserva Exitosa!</h5>
+                                    <p className="text-xs text-slate-600">
+                                        Te esperamos el <strong>{selectedDate}</strong> a las <strong>{selectedTime}</strong>.
+                                    </p>
+                                    <p className="text-xs text-slate-400">Guarda un pantallazo de esta confirmación.</p>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

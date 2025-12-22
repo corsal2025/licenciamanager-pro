@@ -20,7 +20,17 @@ def get_db():
 # For speed, I'll use a dynamic pydantic model or check schemas.py. 
 # Let's assume we don't have one and return generic dict/list for now, or use ORM mode.
 
-@router.get("/", response_model=List[dict]) # Returning dicts for simplicity
-def read_logs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    logs = db.query(models.AuditLog).order_by(models.AuditLog.timestamp.desc()).offset(skip).limit(limit).all()
+@router.get("/", response_model=List[dict])
+def read_logs(
+    skip: int = 0, 
+    limit: int = 100, 
+    entity_id: str = None, # Optional filter
+    db: Session = Depends(get_db)
+):
+    query = db.query(models.AuditLog)
+    
+    if entity_id:
+        query = query.filter(models.AuditLog.entity_id == entity_id)
+        
+    logs = query.order_by(models.AuditLog.timestamp.desc()).offset(skip).limit(limit).all()
     return logs
