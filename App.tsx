@@ -15,6 +15,11 @@ import FolderFinder from './components/FolderFinder';
 import Module16, { ResolutionModule } from './components/Module16';
 import Module12, { DeliveryModule } from './components/Module12';
 import PublicPortal from './components/PublicPortal';
+import PurchasesManagement from './components/PurchasesManagement';
+import ComparisonView from './components/ComparisonView';
+import CloudDriveManager from './components/DriveSyncArea'; // Alias for consistency
+import { Users, FileCheck, FolderX, TrendingUp } from 'lucide-react';
+import { UserRole } from './types'; // Assuming UserRole is in types.ts
 
 // ... (imports)
 
