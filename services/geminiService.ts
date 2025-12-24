@@ -2,12 +2,14 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { LicenseData, LicenseStatus, ProcessStatus } from "../types";
 
 // Initialize Gemini Client
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Initialize Gemini Client
+// const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// FIX: Do not initialize globally or at all in client. Use Backend.
 
 export const analyzeLicenseDocument = async (base64Data: string, mimeType: string): Promise<Partial<LicenseData>> => {
   try {
     const model = "gemini-2.5-flash";
-    
+
     const response = await ai.models.generateContent({
       model: model,
       contents: [
@@ -70,12 +72,12 @@ export const analyzeLicenseDocument = async (base64Data: string, mimeType: strin
     }
 
     const data = JSON.parse(response.text);
-    
+
     // Determine validity status based on expiration date
     let status = LicenseStatus.VALID;
     const today = new Date();
     const expDate = new Date(data.expirationDate);
-    
+
     if (!isNaN(expDate.getTime())) {
       const diffTime = expDate.getTime() - today.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
