@@ -1,5 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+
+// GLOBAL ERROR HANDLER (Emergency Trap)
+window.addEventListener('error', (event) => {
+  document.body.innerHTML = `
+    <div style="padding:20px; color:red; font-family:sans-serif; background:#fff;">
+      <h1>Error Crítico de Inicio</h1>
+      <p>${event.message}</p>
+      <pre>${event.filename}: ${event.lineno}</pre>
+    </div>
+  `;
+});
 import './index.css';
 import App from './App';
 
