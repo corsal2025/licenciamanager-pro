@@ -19,12 +19,12 @@ import PurchasesManagement from './components/PurchasesManagement';
 import ComparisonView from './components/ComparisonView';
 import CloudDriveManager from './components/DriveSyncArea'; // Alias for consistency
 import { Users, FileCheck, FolderX, TrendingUp } from 'lucide-react';
-import { UserRole } from './types'; // Assuming UserRole is in types.ts
+import { UserRole, ViewMode, SystemHealth, User } from './types'; // Assuming UserRole is in types.ts
 
 // ... (imports)
 
 const App = () => {
-  const [view, setView] = useState('dashboard');
+  const [view, setView] = useState<ViewMode>('dashboard');
   const [currentUser, setCurrentUser] = useState<any>(null); // Replace 'any' with User type if available
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const [licenses, setLicenses] = useState<any[]>([]);
@@ -38,7 +38,11 @@ const App = () => {
     uploadedF8: 0,
     denied: 0
   });
-  const [sysHealth, setSysHealth] = useState({ status: 'ok', message: 'Sistema operativo' });
+  const [sysHealth, setSysHealth] = useState<SystemHealth>({
+    lastBackupTime: Date.now(),
+    isSaving: false,
+    needsBackup: false
+  });
   const [notification, setNotification] = useState<{ visible: boolean, type: NotificationType, message: string }>({
     visible: false,
     type: 'info',
@@ -77,17 +81,18 @@ const App = () => {
     setCurrentUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
-    setView('login');
+    setView('dashboard'); // Redirect to dashboard which will redirect to login if no auth
   };
 
   // Placeholders for handlers (logic would be complex to fully restore from 0, providing stubs to fix build)
-  const handleEditLicense = () => { };
-  const handleDeleteLicense = () => { };
-  const handleBulkUpdateStatus = () => { };
-  const handleBulkDelete = () => { };
-  const handleLicenseProcessed = () => { };
-  const handleRestoreData = () => { };
-  const handleUpdateLicense = () => { };
+  const handleEditLicense = (license: any) => { console.log('Edit', license); };
+  const handleDeleteLicense = (id: string) => { console.log('Delete', id); };
+  const handleBulkUpdateStatus = (ids: string[], status: string) => { console.log('Bulk Update', ids, status); };
+  const handleBulkDelete = (ids: string[]) => { console.log('Bulk Delete', ids); };
+  const handleLicenseProcessed = (data: any) => { console.log('Processed', data); };
+  const handleRestoreData = (newLicenses: any[], newUsers: any[]) => { console.log('Restore', newLicenses); };
+  const handleUpdateLicense = (data: any) => { console.log('Update', data); };
+
 
   // Load initial data (stub)
   useEffect(() => {
