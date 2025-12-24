@@ -135,7 +135,15 @@ const App = () => {
           <div className="p-10 text-center text-slate-500">Acceso denegado.</div>
         );
       case 'drive-sync':
-        return <CloudDriveManager />;
+        return (
+          <CloudDriveManager
+            licenses={licenses}
+            currentUser={currentUser}
+            driveFolderUrl={driveFolderUrl}
+            onLicenseUpdate={handleUpdateLicense}
+            onLicenseCreate={handleUpdateLicense}
+          />
+        );
       case 'audit':
         return (
           <AuditLogView />
