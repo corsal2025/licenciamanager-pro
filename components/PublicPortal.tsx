@@ -141,6 +141,66 @@ const PublicPortal: React.FC<PublicPortalProps> = ({ onBack }) => {
                         </button>
                     </form>
 
+                    {/* --- CAR TRACKING LOGIC --- */}
+                    {result && !['DENEGADA', 'SIN CARPETA', 'EN_OBSERVACION'].includes(result.processStatus) && (
+                        <div className="mt-8 pt-6 border-t border-slate-100 animate-in slide-in-from-bottom-4">
+                            <h3 className="text-sm font-bold text-slate-700 mb-6 text-center">Seguimiento de tu Licencia</h3>
+
+                            {/* Road Container */}
+                            <div className="relative mb-8 px-4">
+                                {/* The Grey Road Line */}
+                                <div className="h-2 bg-slate-200 rounded-full w-full absolute top-1/2 transform -translate-y-1/2 left-0 z-0"></div>
+
+                                {/* The Blue Progress Line */}
+                                <div
+                                    className="h-2 bg-indigo-500 rounded-full absolute top-1/2 transform -translate-y-1/2 left-0 z-0 transition-all duration-1000 ease-out"
+                                    style={{
+                                        width: result.processStatus === 'ENTREGADA' ? '100%' :
+                                            result.processStatus === 'LISTA PARA ENTREGA' ? '85%' :
+                                                ['SUBIDA A CONASET', 'AGENDA MENSUAL', 'SUBIDA CON F8', 'EN OFICINA 43'].includes(result.processStatus) ? '50%' : '15%'
+                                    }}
+                                ></div>
+
+                                {/* The Car Icon */}
+                                <div
+                                    className="absolute top-1/2 transform -translate-y-1/2 z-10 transition-all duration-1000 ease-out"
+                                    style={{
+                                        left: result.processStatus === 'ENTREGADA' ? '95%' :
+                                            result.processStatus === 'LISTA PARA ENTREGA' ? '80%' :
+                                                ['SUBIDA A CONASET', 'AGENDA MENSUAL', 'SUBIDA CON F8', 'EN OFICINA 43'].includes(result.processStatus) ? '45%' : '10%'
+                                    }}
+                                >
+                                    <div className="bg-indigo-600 p-2 rounded-full shadow-lg shadow-indigo-600/40 relative">
+                                        {/* Simple Car SVG */}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                                            <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
+                                            <circle cx="7" cy="17" r="2" />
+                                            <circle cx="17" cy="17" r="2" />
+                                        </svg>
+                                        {/* Motion Lines */}
+                                        <div className="absolute -left-2 top-1/2 -translate-y-1/2 space-y-0.5">
+                                            <div className="w-2 h-0.5 bg-indigo-300/50 rounded-full"></div>
+                                            <div className="w-3 h-0.5 bg-indigo-300/50 rounded-full ml-1"></div>
+                                        </div>
+                                    </div>
+
+                                    {/* Tooltip Label above car */}
+                                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded whitespace-nowrap">
+                                        {result.processStatus}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Stages Labels */}
+                            <div className="flex justify-between text-[10px] font-bold text-slate-400 px-1">
+                                <span>Ingreso</span>
+                                <span>En Trámite</span>
+                                <span>Por Retirar</span>
+                                <span>Entregada</span>
+                            </div>
+                        </div>
+                    )}
+
                     {error && (
                         <div className="mt-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-700 text-sm flex items-start gap-3 animate-in slide-in-from-bottom-2">
                             <AlertTriangle className="w-5 h-5 flex-shrink-0" />

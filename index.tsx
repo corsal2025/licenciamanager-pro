@@ -45,7 +45,5 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 
 const root = ReactDOM.createRoot(rootElement);
 root.render(
-  <ErrorBoundary>
-    <App />
-  </ErrorBoundary>
+  <App />
 );

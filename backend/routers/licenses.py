@@ -31,7 +31,13 @@ def create_license(license: schemas.LicenseCreate, username: str = "SYSTEM", db:
     # Note: Added 'username' param. Frontend should send it or extract from token. 
     # For now ensuring backward compatibility if needed, or assuming updated call.
     
-    db_license = models.License(**license.dict(), id=license.rut) 
+    import time
+    db_license = models.License(
+        **license.dict(), 
+        id=license.rut,
+        upload_date=int(time.time()),
+        uploaded_by=username
+    ) 
     # Check if exists (and not deleted? OR if deleted, restore it?)
     existing = db.query(models.License).filter(models.License.rut == license.rut).first()
     if existing:

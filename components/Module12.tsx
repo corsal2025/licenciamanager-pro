@@ -3,6 +3,7 @@ import { Box, Send, Mail, CheckCircle, Search, MessageSquare, Phone, User as Use
 import { LicenseData, ProcessStatus, User } from '../types';
 import { reportService } from '../services/reportService';
 import NotificationModal from './NotificationModal';
+import confetti from 'canvas-confetti';
 
 interface Module12Props {
   licenses: LicenseData[];
@@ -152,6 +153,12 @@ export const DeliveryModule: React.FC<Module12Props> = ({ licenses, onUpdateStat
                       onClick={() => {
                         if (window.confirm(`¿Confirmar entrega a ${license.fullName}?`)) {
                           onUpdateStatus(license.id, ProcessStatus.DELIVERED);
+                          confetti({
+                            particleCount: 150,
+                            spread: 70,
+                            origin: { y: 0.6 },
+                            zIndex: 9999
+                          });
                         }
                       }}
                       className="flex flex-col items-center justify-center p-2 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors"

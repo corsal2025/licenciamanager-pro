@@ -12,7 +12,9 @@ import {
   Pie,
   Cell,
   LineChart,
-  Line
+  Line,
+  ComposedChart,
+  Area
 } from 'recharts';
 import { LicenseData, Purchase, PurchaseStatus } from '../types';
 import { reportService } from '../services/reportService';
@@ -109,6 +111,68 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ licenses }) => 
     return Object.entries(counts)
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value);
+  }, [licenses]);
+
+  // 6. Predictive Analytics (Linear Regression)
+  const projectionData = useMemo(() => {
+    // Group by Month (YYYY-MM)
+    const months: Record<string, number> = {};
+    licenses.forEach(l => {
+      const d = new Date(l.uploadDate * 1000); // Assuming seconds
+      const key = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+      months[key] = (months[key] || 0) + 1;
+    });
+
+    // Convert to Array sorted by date
+    const labels = Object.keys(months).sort();
+    const dataPoints = labels.map((label, index) => ({
+      x: index,
+      y: months[label],
+      label
+    }));
+
+    if (dataPoints.length < 2) return [];
+
+    // Calculate Regression (y = mx + b)
+    const n = dataPoints.length;
+    const sumX = dataPoints.reduce((acc, p) => acc + p.x, 0);
+    const sumY = dataPoints.reduce((acc, p) => acc + p.y, 0);
+    const sumXY = dataPoints.reduce((acc, p) => acc + (p.x * p.y), 0);
+    const sumXX = dataPoints.reduce((acc, p) => acc + (p.x * p.x), 0);
+
+    const m = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+    const b = (sumY - m * sumX) / n;
+
+    // Generate Data for Chart (History + 3 Months Projection)
+    const result = [];
+
+    // History
+    dataPoints.forEach(p => {
+      result.push({
+        name: p.label,
+        actual: p.y,
+        trend: (m * p.x + b).toFixed(1)
+      });
+    });
+
+    // Projection
+    for (let i = 1; i <= 3; i++) {
+      const nextX = n - 1 + i;
+      const nextY = m * nextX + b;
+      // Generate label for next month
+      const lastDate = new Date(labels[labels.length - 1] + "-02"); // Avoid timezone edge cases
+      lastDate.setMonth(lastDate.getMonth() + i);
+      const nextLabel = `${lastDate.getFullYear()}-${(lastDate.getMonth() + 1).toString().padStart(2, '0')}`;
+
+      result.push({
+        name: nextLabel,
+        actual: null,
+        trend: Math.max(0, nextY).toFixed(1), // No negative licenses
+        isProjection: true
+      });
+    }
+
+    return result;
   }, [licenses]);
 
   return (
@@ -281,7 +345,6 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ licenses }) => 
           </div>
         </div>
 
-        {/* User Productivity - Bar Chart */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2">
           <h3 className="text-lg font-bold mb-2 text-gray-700 flex items-center gap-2">
             <Users className="w-5 h-5 text-blue-500" />
@@ -300,6 +363,28 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ licenses }) => 
                 />
                 <Bar dataKey="value" fill="#EC4899" radius={[4, 4, 0, 0]} name="Licencias Procesadas" barSize={40} />
               </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Predictive Analytics Chart */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2">
+          <h3 className="text-lg font-bold mb-2 text-gray-700 text-indigo-700 flex items-center gap-2">
+            <TrendingUp className="w-5 h-5" />
+            Proyección de Demanda (IA Lineal)
+          </h3>
+          <p className="text-sm text-gray-500 mb-6">Proyección matemática de atenciones para los próximos 3 meses basada en la tendencia histórica actual.</p>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={projectionData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                <YAxis axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                <Legend />
+                <Bar dataKey="actual" name="Atenciones Reales" barSize={30} fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                <Line type="monotone" dataKey="trend" name="Tendencia / Proyección" stroke="#EF4444" strokeWidth={3} dot={{ r: 4 }} />
+              </ComposedChart>
             </ResponsiveContainer>
           </div>
         </div>

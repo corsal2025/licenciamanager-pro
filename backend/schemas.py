@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from typing import Optional, List
 from .models import UserRole, LicenseStatus, ProcessStatus
 
@@ -36,7 +36,12 @@ class LicenseBase(BaseModel):
     phone: Optional[str] = None
 
 class LicenseCreate(LicenseBase):
-    pass
+    @validator('rut')
+    def validate_chilean_rut(cls, v):
+        from .utils.rut import validate_rut, format_rut
+        if not validate_rut(v):
+            raise ValueError('RUT inválido. Verifique el dígito verificador.')
+        return format_rut(v)
 
 class LicenseResponse(LicenseBase):
     id: str

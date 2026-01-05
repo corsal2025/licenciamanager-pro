@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { ShieldCheck, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShieldCheck, User, Lock, AlertCircle, Loader2 } from 'lucide-react';
 import { User as UserType, UserRole } from '../types';
 
 interface LoginScreenProps {
@@ -9,18 +9,57 @@ interface LoginScreenProps {
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onPublicPortalClick }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleDirectLogin = () => {
-    // Crear usuario dummy admin
-    const devUser: UserType = {
-      id: 'dev-admin',
-      username: 'ADMIN',
-      password: '',
-      fullName: 'Administrador',
-      role: UserRole.ADMIN,
-      createdAt: Date.now()
-    };
-    onLoginSuccess(devUser);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const formData = new FormData();
+      formData.append('username', username);
+      formData.append('password', password);
+
+      const response = await fetch('http://localhost:8000/token', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Credenciales incorrectas');
+      }
+
+      const data = await response.json();
+      localStorage.setItem('token', data.access_token);
+
+      // In a real app we would decode the token or fetch /users/me
+      // For now we construct the user object assuming admin/admin logic matches
+      // But let's fetch the user details properly if we can, or simulate for now
+
+      // Fetch user role/details (Simulation based on successful login)
+      // Ideally we would have a /users/me endpoint.
+      // Let's assume username is the ID for now as per backend logic
+
+      const loggedUser: UserType = {
+        id: username,
+        username: username,
+        password: '', // Don't store
+        fullName: username === 'admin' ? 'Administrador' : username,
+        role: username === 'admin' ? UserRole.ADMIN : UserRole.USER,
+        createdAt: Date.now()
+      };
+
+      onLoginSuccess(loggedUser);
+
+    } catch (err) {
+      setError('Usuario o contraseña incorrectos');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -34,30 +73,73 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onPublicPorta
           <p className="text-blue-100 text-sm mt-1">Sistema de Gestión Documental</p>
         </div>
 
-        <div className="p-8 flex-1 text-center">
-          <h2 className="text-xl font-bold text-slate-800 mb-2">Modo de Trabajo</h2>
-          <p className="text-slate-500 text-sm mb-8">
-            La autenticación ha sido deshabilitada temporalmente para facilitar el desarrollo y carga de datos.
-          </p>
+        <div className="p-8 flex-1">
+          <h2 className="text-xl font-bold text-slate-800 mb-6 text-center">Iniciar Sesión</h2>
 
-          <button
-            onClick={handleDirectLogin}
-            className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20"
-          >
-            Ingreso Directo (Admin) <ArrowRight className="w-5 h-5" />
-          </button>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Usuario</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-slate-400" />
+                </div>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="pl-10 block w-full rounded-lg border-slate-300 border focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                  placeholder="Ej. admin"
+                  required
+                />
+              </div>
+            </div>
 
-          <div className="mt-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-slate-400" />
+                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10 block w-full rounded-lg border-slate-300 border focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+            </div>
+
+            {error && (
+              <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg flex items-center gap-2">
+                <AlertCircle className="w-4 h-4" />
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> Verificando...
+                </>
+              ) : (
+                'Ingresar al Sistema'
+              )}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
             <button
               onClick={() => onPublicPortalClick && onPublicPortalClick()}
-              className="w-full bg-indigo-50 text-indigo-700 py-3 rounded-xl font-bold hover:bg-indigo-100 transition-all border border-indigo-200"
+              className="text-blue-600 text-sm font-medium hover:underline"
             >
-              Consultar Estado (Público)
+              Consultar Estado (Acceso Público)
             </button>
-          </div>
-
-          <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-            <p className="text-xs text-slate-400">Departamento de Tránsito y Licencias</p>
           </div>
         </div>
       </div>
