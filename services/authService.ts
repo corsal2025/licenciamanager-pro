@@ -2,6 +2,7 @@ import { User, UserRole } from '../types';
 import { api } from './api';
 
 const AUTH_KEY = 'licenciamanager_auth';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const authService = {
   login: async (username: string, password: string): Promise<User> => {
@@ -11,7 +12,7 @@ export const authService = {
     formData.append('password', password);
 
     // We use direct fetch here because it's a form-data request, not JSON
-    const response = await fetch('http://localhost:8000/token', {
+    const response = await fetch(`${API_URL}/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',

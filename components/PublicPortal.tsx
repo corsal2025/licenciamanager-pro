@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Search, ArrowLeft, CheckCircle, AlertTriangle, Clock, MapPin, XCircle, Calendar } from 'lucide-react';
 import { api } from '../services/api';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 interface PublicStatus {
     rut: string;
     fullName: string;
@@ -71,7 +73,7 @@ const PublicPortal: React.FC<PublicPortalProps> = ({ onBack }) => {
             // Direct fetch to avoid auth header issues if api wrapper enforces it
             // But assuming we can make a public request. 
             // Let's try standard fetch first for safety against auth interceptors entanglements
-            const response = await fetch(`http://localhost:8000/public/status/${rut}`);
+            const response = await fetch(`${API_URL}/public/status/${rut}`);
 
             if (!response.ok) {
                 if (response.status === 404) throw new Error("RUT no encontrado en nuestros registros.");

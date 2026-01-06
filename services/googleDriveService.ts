@@ -1,6 +1,8 @@
 
 import { v4 as uuidv4 } from 'uuid';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 // Types for simulated Drive files
 export interface DriveFile {
   id: string;
@@ -155,7 +157,7 @@ export const googleDriveService = {
     try {
       // Using the authService token if available, though currently the drive endpoint is open/authed
       // Ideally we would add headers authorization here
-      const response = await fetch('http://localhost:8000/drive/upload', {
+      const response = await fetch(`${API_URL}/drive/upload`, {
         method: 'POST',
         body: formData,
       });

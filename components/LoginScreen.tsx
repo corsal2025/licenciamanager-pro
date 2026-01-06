@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { ShieldCheck, User, Lock, AlertCircle, Loader2 } from 'lucide-react';
 import { User as UserType, UserRole } from '../types';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 interface LoginScreenProps {
   onLoginSuccess: (user: UserType) => void;
   onPublicPortalClick?: () => void;
@@ -24,10 +26,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onPublicPorta
       formData.append('username', username);
       formData.append('password', password);
 
-      const response = await fetch('http://localhost:8000/token', {
+      const response = await fetch(`${API_URL}/token`, {
         method: 'POST',
         body: formData,
       });
+
 
       if (!response.ok) {
         throw new Error('Credenciales incorrectas');
