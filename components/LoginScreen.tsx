@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ShieldCheck, User, Lock, AlertCircle, Loader2 } from 'lucide-react';
+import { ShieldCheck, User, Lock, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
 import { User as UserType, UserRole } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -13,6 +13,7 @@ interface LoginScreenProps {
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onPublicPortalClick }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -104,13 +105,20 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onPublicPorta
                   <Lock className="h-5 w-5 text-slate-400" />
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 block w-full rounded-lg border-slate-300 border focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                  className="pl-10 pr-10 block w-full rounded-lg border-slate-300 border focus:ring-blue-500 focus:border-blue-500 p-2.5"
                   placeholder="••••••••"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
               </div>
             </div>
 

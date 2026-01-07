@@ -150,6 +150,22 @@ const PublicPortal: React.FC<PublicPortalProps> = ({ onBack }) => {
 
                             {/* Road Container */}
                             <div className="relative mb-8 px-4">
+                                {/* START Marker */}
+                                <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 z-20">
+                                    <div className="flex flex-col items-center">
+                                        <span className="text-lg">🚦</span>
+                                        <span className="text-[8px] font-bold text-green-600 mt-1">INICIO</span>
+                                    </div>
+                                </div>
+
+                                {/* FINISH Marker */}
+                                <div className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1 z-20">
+                                    <div className="flex flex-col items-center">
+                                        <span className="text-lg">🏁</span>
+                                        <span className="text-[8px] font-bold text-indigo-600 mt-1">META</span>
+                                    </div>
+                                </div>
+
                                 {/* The Grey Road Line */}
                                 <div className="h-2 bg-slate-200 rounded-full w-full absolute top-1/2 transform -translate-y-1/2 left-0 z-0"></div>
 
