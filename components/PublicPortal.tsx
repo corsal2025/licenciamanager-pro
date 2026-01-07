@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, ArrowLeft, CheckCircle, AlertTriangle, Clock, MapPin, XCircle, Calendar } from 'lucide-react';
 import { api } from '../services/api';
+import { formatRut } from '../utils/formatters';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -129,7 +130,8 @@ const PublicPortal: React.FC<PublicPortalProps> = ({ onBack }) => {
                                 placeholder="Ej: 12.345.678-9"
                                 className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                 value={rut}
-                                onChange={(e) => setRut(e.target.value)}
+                                onChange={(e) => setRut(formatRut(e.target.value))}
+                                maxLength={12}
                             />
                         </div>
                         <button

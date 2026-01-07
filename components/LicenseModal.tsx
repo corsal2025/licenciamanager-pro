@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, User, CreditCard, Globe, Calendar, FileText, MapPin, FolderX, AlertCircle } from 'lucide-react';
 import { LicenseData, LicenseStatus, ProcessStatus } from '../types';
+import { formatRut } from '../utils/formatters';
 
 interface LicenseModalProps {
   license: LicenseData;
@@ -21,7 +22,12 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ license, isOpen, onClose, o
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    // Auto-format RUT field
+    if (name === 'rut') {
+      setFormData(prev => ({ ...prev, [name]: formatRut(value) }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
