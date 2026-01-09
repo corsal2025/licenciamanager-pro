@@ -34,6 +34,13 @@ class LicenseBase(BaseModel):
     process_status: str
     email: Optional[str] = None
     phone: Optional[str] = None
+    # New tracking fields
+    tipo_tramite: Optional[str] = None
+    exam_teorico: Optional[str] = 'PENDIENTE'
+    exam_practico: Optional[str] = 'PENDIENTE'
+    exam_medico: Optional[str] = 'PENDIENTE'
+    restricciones_medicas: Optional[str] = None
+    fecha_control: Optional[str] = None
 
 class LicenseCreate(LicenseBase):
     @validator('rut')

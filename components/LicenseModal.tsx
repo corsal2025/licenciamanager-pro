@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Save, User, CreditCard, Globe, Calendar, FileText, MapPin, FolderX, AlertCircle } from 'lucide-react';
-import { LicenseData, LicenseStatus, ProcessStatus } from '../types';
+import { X, Save, User, CreditCard, Globe, Calendar, FileText, MapPin, FolderX, AlertCircle, ClipboardCheck, Stethoscope, Car } from 'lucide-react';
+import { LicenseData, LicenseStatus, ProcessStatus, TipoTramite, ExamStatus } from '../types';
 import { formatRut } from '../utils/formatters';
 
 interface LicenseModalProps {
@@ -97,6 +97,114 @@ const LicenseModal: React.FC<LicenseModalProps> = ({ license, isOpen, onClose, o
                   placeholder="Ej: B, C, A2"
                 />
               </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-purple-700 uppercase flex items-center gap-2">
+                  <FileText className="w-3 h-3" /> Tipo de Trámite
+                </label>
+                <select
+                  name="tipoTramite"
+                  value={formData.tipoTramite || ''}
+                  onChange={handleChange}
+                  className="w-full p-2.5 border border-purple-200 rounded-lg bg-purple-50/30 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                >
+                  <option value="">-- Seleccionar --</option>
+                  <option value={TipoTramite.RENOVACION}>🔄 Renovación</option>
+                  <option value={TipoTramite.PRIMERA_VEZ}>🆕 Primera Vez</option>
+                  <option value={TipoTramite.EXTENSION}>➕ Extensión</option>
+                  <option value={TipoTramite.DUPLICADO}>📋 Duplicado</option>
+                  <option value={TipoTramite.CAMBIO_DOMICILIO}>🏠 Cambio Domicilio</option>
+                  <option value={TipoTramite.CANJE}>🌍 Canje Internacional</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Exam Status Section */}
+            <div className="p-4 bg-amber-50/50 border border-amber-100 rounded-xl space-y-4">
+              <h3 className="text-xs font-bold text-amber-700 uppercase flex items-center gap-2">
+                <ClipboardCheck className="w-3 h-3" /> Estado de Exámenes
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-500 flex items-center gap-1">
+                    📝 Teórico
+                  </label>
+                  <select
+                    name="examTeorico"
+                    value={formData.examTeorico || 'PENDIENTE'}
+                    onChange={handleChange}
+                    className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:outline-none"
+                  >
+                    <option value="PENDIENTE">⏳ Pendiente</option>
+                    <option value="APROBADO">✅ Aprobado</option>
+                    <option value="REPROBADO (1er intento)">❌ Reprobado 1°</option>
+                    <option value="REPROBADO (2do intento)">⛔ Reprobado 2°</option>
+                    <option value="NO APLICA">➖ No Aplica</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-500 flex items-center gap-1">
+                    <Stethoscope className="w-3 h-3" /> Médico
+                  </label>
+                  <select
+                    name="examMedico"
+                    value={formData.examMedico || 'PENDIENTE'}
+                    onChange={handleChange}
+                    className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:outline-none"
+                  >
+                    <option value="PENDIENTE">⏳ Pendiente</option>
+                    <option value="APROBADO">✅ Aprobado</option>
+                    <option value="REPROBADO (1er intento)">❌ Reprobado 1°</option>
+                    <option value="REPROBADO (2do intento)">⛔ Reprobado 2°</option>
+                    <option value="NO APLICA">➖ No Aplica</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-500 flex items-center gap-1">
+                    <Car className="w-3 h-3" /> Práctico
+                  </label>
+                  <select
+                    name="examPractico"
+                    value={formData.examPractico || 'PENDIENTE'}
+                    onChange={handleChange}
+                    className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:outline-none"
+                  >
+                    <option value="PENDIENTE">⏳ Pendiente</option>
+                    <option value="APROBADO">✅ Aprobado</option>
+                    <option value="REPROBADO (1er intento)">❌ Reprobado 1°</option>
+                    <option value="REPROBADO (2do intento)">⛔ Reprobado 2°</option>
+                    <option value="NO APLICA">➖ No Aplica</option>
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-500">Restricciones Médicas</label>
+                  <input
+                    type="text"
+                    name="restriccionesMedicas"
+                    value={formData.restriccionesMedicas || ''}
+                    onChange={handleChange}
+                    placeholder="Ej: Lentes, audífonos..."
+                    className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:outline-none"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-blue-700 uppercase flex items-center gap-2">
+                    <Calendar className="w-3 h-3" /> Fecha Próximo Control
+                  </label>
+                  <input
+                    type="text"
+                    name="fechaControl"
+                    value={formData.fechaControl || ''}
+                    onChange={handleChange}
+                    placeholder="Ej: MARZO 2027"
+                    className="w-full p-2 border border-blue-200 rounded-lg bg-blue-50/30 text-sm focus:outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-xs font-bold text-blue-700 uppercase flex items-center gap-2">
                   <Calendar className="w-3 h-3" /> Último Control

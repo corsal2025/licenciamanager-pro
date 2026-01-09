@@ -28,6 +28,23 @@ export enum UserRole {
   OPERATOR = 'OPERADOR'
 }
 
+export enum TipoTramite {
+  RENOVACION = 'RENOVACIÓN',
+  PRIMERA_VEZ = 'PRIMERA VEZ',
+  EXTENSION = 'EXTENSIÓN',
+  DUPLICADO = 'DUPLICADO',
+  CAMBIO_DOMICILIO = 'CAMBIO DOMICILIO',
+  CANJE = 'CANJE INTERNACIONAL'
+}
+
+export enum ExamStatus {
+  PENDIENTE = 'PENDIENTE',
+  APROBADO = 'APROBADO',
+  REPROBADO_1 = 'REPROBADO (1er intento)',
+  REPROBADO_2 = 'REPROBADO (2do intento)',
+  NO_APLICA = 'NO APLICA'
+}
+
 // ... existing enums ...
 
 export interface User {
@@ -51,12 +68,20 @@ export interface LicenseData {
   uploadDate: number;
   uploadedBy: string;
 
-  // New Contact Fields
+  // Contact Fields
   email?: string;
   phone?: string;
 
   // Soft Delete
   isDeleted?: boolean;
+
+  // Process Tracking Fields
+  tipoTramite?: string;
+  examTeorico?: string;
+  examPractico?: string;
+  examMedico?: string;
+  restriccionesMedicas?: string;
+  fechaControl?: string;
 
   // Legacy fields
   issueDate?: string;

@@ -36,6 +36,21 @@ class PurchaseStatus(str, enum.Enum):
     PURCHASED = 'COMPRADO'
     REJECTED = 'RECHAZADO'
 
+class TipoTramite(str, enum.Enum):
+    RENOVACION = 'RENOVACIÓN'
+    PRIMERA_VEZ = 'PRIMERA VEZ'
+    EXTENSION = 'EXTENSIÓN'
+    DUPLICADO = 'DUPLICADO'
+    CAMBIO_DOMICILIO = 'CAMBIO DOMICILIO'
+    CANJE = 'CANJE INTERNACIONAL'
+
+class ExamStatus(str, enum.Enum):
+    PENDIENTE = 'PENDIENTE'
+    APROBADO = 'APROBADO'
+    REPROBADO_1 = 'REPROBADO (1er intento)'
+    REPROBADO_2 = 'REPROBADO (2do intento)'
+    NO_APLICA = 'NO APLICA'
+
 class User(Base):
     __tablename__ = "users"
 
@@ -66,6 +81,14 @@ class License(Base):
     
     # New Field for Soft Delete
     is_deleted = Column(Boolean, default=False)
+    
+    # New Fields for Process Tracking
+    tipo_tramite = Column(String, nullable=True)  # RENOVACIÓN, PRIMERA VEZ, etc.
+    exam_teorico = Column(String, nullable=True, default='PENDIENTE')
+    exam_practico = Column(String, nullable=True, default='PENDIENTE')
+    exam_medico = Column(String, nullable=True, default='PENDIENTE')
+    restricciones_medicas = Column(String, nullable=True)  # Lentes, audífonos, etc.
+    fecha_control = Column(String, nullable=True)  # Fecha próximo control
 
 class Purchase(Base):
     __tablename__ = "purchases"
