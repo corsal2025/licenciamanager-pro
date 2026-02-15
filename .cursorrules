@@ -1,0 +1,42 @@
+# Licencia Manager Pro
+
+You are working on Licencia Manager Pro, a full-stack web app for managing driver's licenses in Chilean municipalities.
+
+## Stack
+- Frontend: React + TypeScript + Vite + TailwindCSS
+- Backend: Python + FastAPI + SQLAlchemy + SQLite
+- AI: Google Gemini API
+- Deploy: Vercel
+
+## Structure
+```
+backend/           # FastAPI API
+├── routers/       # Endpoints (auth, licenses, ai, drive, etc.)
+├── models.py      # SQLAlchemy models
+├── schemas.py     # Pydantic schemas
+components/        # React components (21 files)
+services/          # Frontend API/auth services
+types.ts           # TypeScript interfaces
+```
+
+## Conventions
+- TypeScript: functional components, interfaces over types
+- Python: Pydantic validation, SQLAlchemy ORM
+- Icons: Lucide React
+- UI Language: Spanish (Chile)
+- Code: English
+
+## Key Patterns
+- API calls via `services/api.ts`
+- JWT auth in localStorage
+- Roles: admin, operator, viewer
+- License flow: PENDIENTE → EN_PROCESO → APROBADA → LISTA_PARA_ENTREGA → ENTREGADA
+
+## Commands
+```bash
+# Backend
+uvicorn backend.main:app --reload
+
+# Frontend
+npm run dev
+```
